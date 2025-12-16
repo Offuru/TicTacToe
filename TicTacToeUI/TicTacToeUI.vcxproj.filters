@@ -29,16 +29,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="MainWindow.qrc">
+    <QtRcc Include="src\views\MainWindow.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <QtUic Include="MainWindow.ui">
+    <QtUic Include="src\views\MainWindow.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="MainWindow.h">
+    <QtMoc Include="include\views\MainWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="MainWindow.cpp">
+    <ClCompile Include="src\views\MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -46,24 +46,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameViewModel.cpp">
+    <ClCompile Include="src\viewmodel\GameViewModel.cpp">
       <Filter>ViewModels</Filter>
     </ClCompile>
-    <ClCompile Include="CellWidget.cpp">
+    <ClCompile Include="src\widgets\CellWidget.cpp">
       <Filter>Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="BoardWidget.cpp">
+    <ClCompile Include="src\widgets\BoardWidget.cpp">
       <Filter>Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="CellWidget.h">
+    <QtMoc Include="include\widgets\CellWidget.h">
       <Filter>Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="BoardWidget.h">
+    <QtMoc Include="include\widgets\BoardWidget.h">
       <Filter>Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="GameViewModel.h">
+    <QtMoc Include="include\viewmodel\GameViewModel.h">
       <Filter>Widgets</Filter>
     </QtMoc>
   </ItemGroup>

@@ -1,4 +1,4 @@
-#include "CellWidget.h"
+#include "include/widgets/CellWidget.h"
 #include <QFont>
 
 CellWidget::CellWidget(uint8_t row, uint8_t column, QWidget* parent) :

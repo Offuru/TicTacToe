@@ -4,7 +4,7 @@
 #include <QGridLayout>
 #include <array>
 #include "CellWidget.h"
-#include "GameViewModel.h"
+#include "../viewmodel/GameViewModel.h"
 
 class BoardWidget : public QWidget
 {

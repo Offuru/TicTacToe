@@ -5,11 +5,12 @@
 #include <optional>
 #include <memory>
 
+#include "ForwardDeclarations.h"
+
 namespace tictactoe
 {
 	using std::uint8_t;
-	using Position = std::pair<uint8_t, uint8_t>;
-
+	
 	enum class Symbol : uint8_t
 	{
 		X,
@@ -38,6 +39,5 @@ namespace tictactoe
 		std::array<std::array<std::optional<Symbol>, 3>, 3> m_grid;
 	};
 
-	using BoardPtr = std::unique_ptr<Board>;
-	using BoardRef = std::reference_wrapper<Board>;
+	
 }

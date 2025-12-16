@@ -5,8 +5,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include "ui_MainWindow.h"
-#include "GameViewModel.h"
-#include "BoardWidget.h"
+#include "include/viewmodel/GameViewModel.h"
+#include "include/widgets/BoardWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindowClass; };
