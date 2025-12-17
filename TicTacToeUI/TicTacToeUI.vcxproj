@@ -60,19 +60,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>E:\Facultate\predat\mc\TicTacToe\TicTacToe;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Facultate\predat\mc\TicTacToe\x64\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)TicTacToe\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TicTacToe\include;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <LibraryPath>E:\Facultate\predat\mc\TicTacToe\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalBMIDirectories>E:\Facultate\predat\mc\TicTacToe\TicTacToe;%(AdditionalBMIDirectories)</AdditionalBMIDirectories>
+      <AdditionalBMIDirectories>%(AdditionalBMIDirectories)</AdditionalBMIDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>true</BuildStlModules>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -111,18 +114,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <QtRcc Include="MainWindow.qrc" />
-    <QtUic Include="MainWindow.ui" />
-    <QtMoc Include="MainWindow.h" />
-    <ClCompile Include="BoardWidget.cpp">
+    <QtRcc Include="src\views\MainWindow.qrc" />
+    <QtUic Include="src\views\MainWindow.ui" />
+    <QtMoc Include="include\views\MainWindow.h" />
+    <ClCompile Include="src\widgets\BoardWidget.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
-    <ClCompile Include="CellWidget.cpp" />
-    <ClCompile Include="GameViewModel.cpp" />
-    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="src\widgets\CellWidget.cpp" />
+    <ClCompile Include="src\viewmodel\GameViewModel.cpp" />
+    <ClCompile Include="src\views\MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -131,13 +134,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="CellWidget.h" />
+    <QtMoc Include="include\widgets\CellWidget.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="BoardWidget.h" />
+    <QtMoc Include="include\widgets\BoardWidget.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="GameViewModel.h" />
+    <QtMoc Include="include\viewmodel\GameViewModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

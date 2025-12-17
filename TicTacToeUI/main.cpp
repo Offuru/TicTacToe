@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "include/views/MainWindow.h"
 #include <QtWidgets/QApplication>
 #include <QMetaType>
 #include <optional>

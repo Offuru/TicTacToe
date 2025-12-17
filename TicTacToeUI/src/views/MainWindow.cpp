@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "include/views/MainWindow.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFont>

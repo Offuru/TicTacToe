@@ -116,6 +116,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(TargetPath)" "$(SolutionDir)x64\$(Configuration)\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -135,15 +138,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Board.ixx" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Game.ixx" />
+    <ClCompile Include="src\Board.cpp" />
+    <ClCompile Include="include\modules\Board.ixx" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="include\modules\Game.ixx" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Board.h" />
-    <ClInclude Include="Game.h" />
+    <ClInclude Include="include\Board.h" />
+    <ClInclude Include="include\ForwardDeclarations.h" />
+    <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\interfaces\IListener.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

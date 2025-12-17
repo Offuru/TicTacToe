@@ -1,4 +1,4 @@
-#include "BoardWidget.h"
+#include "include/widgets/BoardWidget.h"
 
 BoardWidget::BoardWidget(GameViewModel* viewModel, QWidget* parent)
 	: QWidget(parent)

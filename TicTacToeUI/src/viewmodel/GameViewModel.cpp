@@ -1,8 +1,15 @@
-#include "GameViewModel.h"
+#include "include/viewmodel/GameViewModel.h"
 
 GameViewModel::GameViewModel(QObject* parent) :
 	QObject(parent), m_game{ std::make_unique<Game>() }
 {
+	m_game->AddListener(this);
+}
+
+GameViewModel::~GameViewModel()
+{
+	if (m_game)
+		m_game->RemoveListener(this);
 }
 
 QString GameViewModel::GetCurrentPlayerString() const
@@ -54,51 +61,38 @@ bool GameViewModel::PlayMove(uint8_t row, uint8_t column)
 	if (row > 2 || column > 2 || row < 0 || column < 0)
 		return false;
 
-	const auto previousState = GetGameState();
-	const auto previousPlayer = GetCurrentPlayer();
-
-	const bool success = m_game->PlayMove({ row, column });
-
-	if (success)
-	{
-		emit CellChanged(row, column, GetCellState(row, column));
-
-		const auto newState = GetGameState();
-
-		if (newState != previousState)
-			emit GameStateChanged(newState);
-
-		const auto newPlayer = GetCurrentPlayer();
-
-		if (newPlayer != previousPlayer && !IsGameOver())
-			emit CurrentPlayerChanged(newPlayer);
-	}
-
-	return success;
+	return m_game->PlayMove({ row, column });
 }
 
 void GameViewModel::ResetGame()
 {
-	m_game = std::make_unique<Game>();
+	m_game->Reset();
+}
 
+void GameViewModel::OnCellChanged(const Position& pos, std::optional<Symbol> newState)
+{
+	emit CellChanged(pos.first, pos.second, newState);
+}
+
+void GameViewModel::OnCurrentPlayerChanged(Symbol newPlayer)
+{
+	emit CurrentPlayerChanged(newPlayer);
+}
+
+void GameViewModel::OnGameStateChanged(GameState newState)
+{
+	emit GameStateChanged(newState);
+}
+
+void GameViewModel::OnGameReset()
+{
 	emit GameReset();
-	NotifyAllCellsChanged();
-	emit GameStateChanged(GetGameState());
-	emit CurrentPlayerChanged(GetCurrentPlayer());
-}
 
-void GameViewModel::NotifyCellChanged(uint8_t row, uint8_t column)
-{
-	emit CellChanged(row, column, GetCellState(row, column));
-}
-
-void GameViewModel::NotifyAllCellsChanged()
-{
 	for (uint8_t row = 0; row < 3; ++row)
 	{
 		for (uint8_t col = 0; col < 3; ++col)
 		{
-			NotifyCellChanged(row, col);
+			emit CellChanged(row, col, std::nullopt);
 		}
 	}
 }
