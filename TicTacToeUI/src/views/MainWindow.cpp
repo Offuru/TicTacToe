@@ -4,12 +4,12 @@
 #include <QFont>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindowClass())
-    , m_viewModel(new GameViewModel(this))
-    , m_boardWidget(nullptr)
-    , m_statusLabel(nullptr)
-    , m_resetButton(nullptr)
+    : QMainWindow{parent}
+    , ui{ new Ui::MainWindowClass{} }
+	, m_viewModel{ std::make_shared<GameViewModel>() }
+    , m_boardWidget{ nullptr }
+    , m_statusLabel{ nullptr }
+    , m_resetButton{ nullptr }
 {
     ui->setupUi(this);
     SetupUI();
@@ -26,12 +26,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::SetupUI()
 {
-    QWidget* centralWidget = new QWidget(this);
-    QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
+    QWidget* centralWidget{ new QWidget{this} };
+    QVBoxLayout* mainLayout{ new QVBoxLayout{centralWidget} };
     mainLayout->setSpacing(20);
     mainLayout->setContentsMargins(20, 20, 20, 20);
 
-    m_statusLabel = new QLabel(this);
+    m_statusLabel = new QLabel{ this };
     m_statusLabel->setAlignment(Qt::AlignCenter);
     QFont labelFont = m_statusLabel->font();
     labelFont.setPointSize(16);
@@ -47,16 +47,16 @@ void MainWindow::SetupUI()
     );
     UpdateStatusLabel();
 
-    m_boardWidget = new BoardWidget(m_viewModel, this);
+    m_boardWidget = new BoardWidget{ m_viewModel, this };
     m_boardWidget->setStyleSheet(
         "BoardWidget {"
         "   background-color: #ffffff;"
         "}"
     );
 
-    m_resetButton = new QPushButton("New Game", this);
+    m_resetButton = new QPushButton{ "New Game", this };
     m_resetButton->setFixedHeight(40);
-    QFont buttonFont = m_resetButton->font();
+    QFont buttonFont{ m_resetButton->font() };
     buttonFont.setPointSize(12);
     buttonFont.setBold(true);
     m_resetButton->setFont(buttonFont);
@@ -86,10 +86,10 @@ void MainWindow::SetupUI()
 
 void MainWindow::ConnectSignals()
 {
-    connect(m_viewModel, &GameViewModel::GameStateChanged,
+    connect(m_viewModel.get(), &GameViewModel::GameStateChanged,
         this, &MainWindow::OnGameStateChanged);
 
-    connect(m_viewModel, &GameViewModel::CurrentPlayerChanged,
+    connect(m_viewModel.get(), &GameViewModel::CurrentPlayerChanged,
         this, &MainWindow::OnCurrentPlayerChanged);
 
     connect(m_resetButton, &QPushButton::clicked,
@@ -116,8 +116,8 @@ void MainWindow::UpdateStatusLabel()
 {
     m_statusLabel->setText(m_viewModel->GetGameStateString());
 
-    GameState state = m_viewModel->GetGameState();
-    QString color;
+    GameState state {m_viewModel->GetGameState()};
+    QString color{};
 
     switch (state)
     {

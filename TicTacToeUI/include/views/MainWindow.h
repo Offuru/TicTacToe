@@ -28,7 +28,7 @@ private slots:
 private:
     Ui::MainWindowClass* ui;
 
-    GameViewModel* m_viewModel;
+    std::shared_ptr<GameViewModel> m_viewModel;
     BoardWidget* m_boardWidget;
     QLabel* m_statusLabel;
     QPushButton* m_resetButton;

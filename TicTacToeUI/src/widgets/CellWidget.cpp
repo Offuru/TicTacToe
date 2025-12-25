@@ -2,11 +2,21 @@
 #include <QFont>
 
 CellWidget::CellWidget(uint8_t row, uint8_t column, QWidget* parent) :
-	QPushButton(parent), m_row{ row }, m_column{ column }, m_symbol{}
+	QPushButton{ parent }, m_row{ row }, m_column{ column }, m_symbol{}
 {
 	connect(this, &QPushButton::clicked, this, &CellWidget::OnClicked);
 	ApplyStyle();
 	UpdateDisplay();
+}
+
+uint8_t CellWidget::GetRow() const
+{
+	return m_row;
+}
+
+uint8_t CellWidget::GetColumn() const
+{
+	return m_column;
 }
 
 void CellWidget::SetState(std::optional<Symbol> state)

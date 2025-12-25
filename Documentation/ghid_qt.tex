@@ -210,10 +210,22 @@ frametitlefontcolor=purple!70!black
     % PARTEA I - CONFIGURARE (Andrei)
     % =============================================================================
     \part{Configurarea Mediului de Dezvoltare}
-    \chapter{Instalare și Configurare Qt 6}
-    \section{Instalarea Qt SDK și Qt Creator}
-    \section{Configurarea Kit-urilor (MinGW vs MSVC)}
-    \section{Structura unui proiect Qt: fișierul .pro vs CMakeLists.txt}
+    \chapter{Instalare și configurare Qt pentru Visual Studio 2022/2026}
+    
+    \begin{enumerate}
+    	\item Se descarcă \href{https://www.qt.io/development/download-qt-installer-oss}{\textcolor{blue}{Qt Online Installer}} pentru platforma dorită.
+    	\item Dacă nu aveți deja unul, creați-vă un cont Qt folosind adresa de e-mail de student.
+    	\item În programul de instalare, selectați opțiunea \textbf{Custom Installation}.
+    	\item Instalați doar \textbf{Qt 6.10.1 MSVC 2022 64-bit}.
+    	\item Deschideți Visual Studio și accesați \textbf{Extensions} > \textbf{Manage Extensions}.
+    	\item Căutați și instalați extensia \textbf{'Qt Visual Studio Tools'}.
+    	\item După instalare, navigați la \textbf{Extensions} > \textbf{Qt VS Tools} > \textbf{Qt Versions}.
+    	\item Apăsați pe \textbf{Add}, iar pentru câmpul \textbf{Location} selectați executabilul \texttt{qmake.exe} din locația unde ați instalat Qt. Calea ar trebui să fie similară cu: \\ \texttt{C:\textbackslash Qt\textbackslash 6.10.1\textbackslash msvc2022\_64\textbackslash bin\textbackslash qmake.exe}
+    	\item Deschideți proiectul \textit{TicTacToe}, selectați \textit{TicTacToeUI} ca proiect de startup și rulați. Erorile ce pot apărea (neidentificarea directorului \texttt{include} sau a fișierelor \texttt{.dll} din \texttt{bin}) sunt cauzate de căi configurate greșit; verificați secțiunea \textbf{'Qt Project Settings'}.
+    	\item Creați un proiect nou de tip \textbf{'Qt Widgets Application'}.
+    	\item La secțiunea \textbf{'Build Configurations'} ar trebui să aveți deja selectată versiunea de Qt instalată anterior. Dacă nu apare, folosiți butonul \textbf{Add} pentru a selecta din nou fișierul \texttt{qmake.exe}.
+    	\item În configurarea ulterioară a proiectului, recomandăm să folosiți opțiunea \textbf{'Member Pointer'} pentru setarea \textbf{'Ui Class Inclusion'}.
+    \end{enumerate}
     
     % =============================================================================
     % PARTEA II - CONCEPT ȘI TEORIE APLICATĂ (Tu + Exemple X și 0)
@@ -664,14 +676,204 @@ void MainWindow::updateButton(QPushButton* btn, char player) {
     % =============================================================================
     \part{Studiu de Caz Complet: X și 0}
     \chapter{Implementarea Jocului X și 0}
+    
+    \href{https://github.com/Offuru/TicTacToe}{\textcolor{blue}{Link repository}}
+    
     \textit{În acest capitol punem cap la cap conceptele discutate anterior pentru a finaliza aplicația.}
     
     \section{Structura Proiectului}
-    Separarea în două module: \texttt{TicTacToeLogic} (C++ pur/Qt non-GUI) și \texttt{TicTacToeGui} (Interfața).
-    \section{Implementarea Business Logic}
-    Matricea internă, verificarea condițiilor de victorie.
-    \section{Integrarea Logică - UI}
-    Instanțierea clasei de logică în \texttt{MainWindow} și conectarea semnalelor.
+    Soluția este organizată în două proiecte distincte pentru a asigura o separare clară a responsabilităților între logica jocului și interfața cu utilizatorul (UI). Această abordare modulară este esențială pentru mentenabilitate, testabilitate și reutilizarea codului.
+    
+    \begin{itemize}
+    	\item \texttt{TicTacToe}: Acesta este proiectul \textit{backend}. El conține toată logica fundamentală a jocului X și 0. Este scris în C++ standard și nu are nicio dependență de biblioteci grafice sau de interfață (precum Qt). Responsabilitățile sale includ gestionarea stării tablei de joc, validarea mutărilor, alternarea jucătorilor și detectarea condițiilor de victorie, remiză sau continuare a jocului.
+    	
+    	\item \texttt{TicTacToeUI}: Acesta este proiectul \textit{frontend}, responsabil cu prezentarea vizuală a jocului și interacțiunea cu utilizatorul. Este o aplicație Qt care consumă logica expusă de proiectul \texttt{TicTacToe}. El se ocupă de randarea tablei de joc, preluarea input-ului de la utilizator (click-uri pe celule) și afișarea stării curente a jocului (e.g., cine a câștigat).
+    \end{itemize}
+    
+    Dependența este unidirecțională: \texttt{TicTacToeUI} depinde de \texttt{TicTacToe}, dar nu și invers. Proiectul de logică nu are nicio cunoștință despre existența unei interfețe grafice, ceea ce îi permite să fie reutilizat cu ușurință în alte contexte, cum ar fi o aplicație consolă, o interfață web sau un set de teste unitare automate.
+    
+    \newpage
+    \subsection{Structura Fișierelor}
+    Organizarea fișierelor reflectă această separare a responsabilităților:
+    \begin{verbatim}
+    	/TicTacToe           # Proiectul de logică (backend)
+    	|-- /include         # Headere
+    	|   |-- /interfaces
+    	|   |   `-- IListener.h
+    	|   |-- /module		 # Pentru scopuri demonstrative, n-am reușit să
+    	|   |   |         # compilăm module cu Qt, poate reușiți voi
+    	|   |   |-- Board.ixx
+    	|   |   `-- Game.ixx
+    	|   |-- Board.h
+    	|   |-- ForwardDeclarations.h
+    	|   `-- Game.h
+    	|-- /src             # Implementarea logicii
+    	|   |-- Board.cpp
+    	|   `-- Game.cpp
+    	`-- Source.cpp       # Punct de intrare pentru testare consolă
+    	
+    	/TicTacToeUI         # Proiectul de interfață Qt (frontend)
+    	|-- /include         # Organizare Headere UI
+    	|   |-- /viewmodel
+    	|   |   `-- GameViewModel.h
+    	|   |-- /views
+    	|   |   `-- MainWindow.h
+    	|   `-- /widgets
+    	|       |-- BoardWidget.h
+    	|       `-- CellWidget.h
+    	|-- /src             # Implementare și resurse Qt
+    	|   |-- /viewmodel
+    	|   |   `-- GameViewModel.cpp
+    	|   |-- /views
+    	|   |   |-- MainWindow.cpp
+    	|   |   |-- MainWindow.qrc
+    	|   |   `-- MainWindow.ui
+    	|   `-- /widgets
+    	|       |-- BoardWidget.cpp
+    	|       `-- CellWidget.cpp
+    	`-- main.cpp         # Punctul de intrare al aplicației grafice
+    \end{verbatim}
+    Fișierele din directorul \texttt{TicTacToe/include} formează contractul public al modulului de logică. Orice componentă externă (precum \texttt{TicTacToeUI}) interacționează cu logica jocului exclusiv prin intermediul acestor headere. Fișierele din \texttt{src} conțin detaliile de implementare, care pot fi modificate fără a afecta consumatorii librăriei, atâta timp cât interfața publică rămâne neschimbată.
+    
+    \subsection{Rolul Observer Pattern}
+    Pentru a decupla complet logica de UI, este necesar un mecanism prin care \textit{backend}-ul să poată notifica \textit{frontend}-ul despre schimbările de stare (e.g., o mutare a fost efectuată, jocul s-a terminat) fără a-l cunoaște direct. Aici intervine design pattern-ul \textbf{Observer}.
+    
+    \begin{enumerate}
+    	\item \textbf{Subiectul (Subject)}: Clasa \texttt{Game} din proiectul de logică joacă rolul de subiect. Ea menține o listă de pointeri către obiecte care implementează o interfață generică de ascultător (de exemplu, \texttt{IListener}).
+    	\item \textbf{Observatorul (Observer)}: O clasă din proiectul UI (de exemplu, \texttt{GameViewModel} sau \texttt{MainWindow}) implementează interfața \texttt{IListener}.
+    	\item \textbf{Mecanismul}: La inițializare, obiectul din UI se "abonează" la obiectul \texttt{Game}, transmițându-i un pointer către sine. Când o acțiune relevantă are loc în \texttt{Game} (e.g., \texttt{PlayMove()}), acesta iterează prin lista sa de ascultători și apelează o metodă de notificare definită în interfață (e.g., \texttt{OnGameStateChanged()}).
+    \end{enumerate}
+    
+    Astfel, \texttt{Game} notifică "în orb" orice observator interesat, fără a avea nevoie să știe cine sunt aceștia sau ce fac cu informația primită. Această arhitectură permite ca logica jocului să rămână pură și independentă, în timp ce interfața grafică poate reacționa în timp real la evenimentele din joc, actualizându-se corespunzător.
+    
+    \subsection{Crearea Proiectelor și Dependențelor}
+    
+    
+    
+    Structura soluției cuprinde două entități distincte:
+    \begin{enumerate}
+    	\item \textbf{Proiectul Backend (Biblioteca Statică)}:
+    	\begin{itemize}
+    		\item Conține toate clasele de logică pură (\texttt{Board}, \texttt{Game}, \texttt{IListener}).
+    		\item În setările proiectului (\textit{Properties -> General}), tipul configurației este setat pe \textbf{Static library (.lib)}.
+    	\end{itemize}
+    	
+    	\item \textbf{Proiectul Frontend (Aplicația Qt)}:
+    	\begin{itemize}
+    		\item Creat ca un proiect de tip \textit{Qt Widgets Application}.
+    		\item Acest proiect depinde direct de funcționalitățile oferite de backend.
+    	\end{itemize}
+    \end{enumerate}
+    
+    \subsection{Integrarea Backend-ului în Frontend}
+    
+    Pentru ca proiectul de Frontend să poată utiliza codul din Backend, au fost parcurși următorii pași de configurare în Visual Studio:
+    
+    \begin{itemize}
+    	\item \textbf{Adăugarea Referinței}: În proiectul de Frontend, s-a accesat \textit{Add -> Reference} și s-a bifat proiectul de Backend. Acest lucru forțează Visual Studio să compileze mai întâi biblioteca și să o lege automat (\textit{linking}) la executabilul final.
+    	\item \textbf{Configurarea Căilor de Incluziune (Include Directories)}:
+    	Pentru ca instrucțiunile \texttt{\#include} să fie rezolvate corect, calea către folderul de headere al backend-ului a fost adăugată în \textit{Properties -> C/C++ -> General -> Additional Include Directories}.
+    	
+    	
+    	
+    	\item \textbf{Alinierea Standardului C++}:
+    	Ambele proiecte au fost configurate să utilizeze același standard de limbaj (\textbf{ISO C++20 Standard} sau \textbf{C++23}) prin setarea \textit{C++ Language Standard} în proprietățile proiectului, asigurând compatibilitatea binară între biblioteca statică și aplicație.
+    \end{itemize}
+    
+    \subsection{Procesul de Build}
+    
+    Datorită setării referințelor, procesul de compilare este simplificat: la declanșarea comenzii \textit{Build Solution}, Visual Studio verifică dependențele, compilează sursele backend în fișierul \texttt{.lib} și apoi compilează frontend-ul, realizând legătura statică a logicii de joc în executabilul final.
+    
+    \section{Implementarea Business Logic (Backend)}
+    
+    Proiectul \texttt{TicTacToe} este conceput ca o bibliotecă de logică pură, independentă de interfața grafică, utilizând concepte avansate de C++ modern pentru a asigura o separare clară a responsabilităților.
+    
+    \subsection{Organizarea fișierelor}
+    
+    \begin{itemize}
+    	\item \textbf{Board.h / Board.cpp}: Gestionează starea internă a tablei de joc folosind o matrice de tip \texttt{std::array}. Conține algoritmul de verificare a victoriei pe rânduri, coloane și diagonale prin utilizarea algoritmilor standard (\texttt{std::all\_of}).
+    	\item \textbf{Game.h / Game.cpp}: Reprezintă motorul principal de joc. Acesta controlează fluxul (schimbarea jucătorului, validarea mutărilor) și deține structura \texttt{GameData}. Implementează mecanismul de notificare a interfeței prin intermediul unei liste de ascultători.
+    	\item \textbf{IListener.h}: Definește interfața abstractă (\textit{pure virtual}) pentru pattern-ul \textbf{Observer}, permițând UI-ului să reacționeze la schimbările de stare (ex: \texttt{OnCellChanged}, \texttt{OnGameStateChanged}).
+    	\item \textbf{ForwardDeclarations.h}: Conține declarații anticipate și alias-uri de tipuri (\texttt{using}) pentru a reduce timpul de compilare și dependențele circulare.
+    	\item \textbf{Source.cpp}: Punct de intrare pentru o versiune simplificată în consolă, utilizat pentru testarea rapidă a logicii înainte de integrarea în interfața grafică.
+    	\item \textbf{Board.ixx / Game.ixx}: Fișiere de interfață de modul care permit exportarea funcționalităților către alte componente folosind noul sistem de module.
+    \end{itemize}
+    
+    \subsection{Elemente de C++ Modern utilizate}
+    
+    În implementare au fost integrate facilități moderne care sporesc siguranța tipurilor și claritatea codului:
+    
+    \begin{itemize}
+    	\item \textbf{Utilizarea \texttt{auto} și deducerea tipurilor}:
+    	\begin{itemize}
+    		\item Cuvântul cheie \texttt{auto} este folosit pentru a simplifica codul și a evita repetarea tipurilor complexe, cum ar fi în cazul iteratorilor sau al rezultatelor returnate de funcții.
+    		\item Exemplu: În \texttt{Board::CheckWinner}, \texttt{auto} preia automat tipul \texttt{std::optional<Symbol>} returnat de metodele de verificare.
+    	\end{itemize}
+    	
+    	\item \textbf{Declararea variabilelor în condiția \texttt{if} (C++17)}:
+    	\begin{itemize}
+    		\item Se utilizează sintaxa \texttt{if (init; condition)} pentru a limita durata de viață a variabilelor temporare.
+    		\item Exemplu: \texttt{if (const auto\& rowWinner = CheckRow(i); rowWinner.has\_value())} asigură că \texttt{rowWinner} există doar în interiorul acelui bloc \texttt{if}.
+    	\end{itemize}
+    	
+    	\item \textbf{Particularități ale Expresiilor Lambda (C++17/20)}:
+    	\begin{itemize}
+    		\item \textbf{Mutable Lambdas}: În \texttt{CheckDiagonals}, se folosește \texttt{mutable} pentru a permite modificarea variabilelor capturate prin valoare (precum contorul \texttt{n}) în interiorul algoritmului.
+    		\item \textbf{Predicate pentru Algoritmi}: Lambda-urile sunt transmise către \texttt{std::all\_of} pentru a verifica starea celulelor într-un mod declarativ și concis.
+    	\end{itemize}
+    	
+    	\item \textbf{Utilizarea \texttt{const\_cast} pentru operatori}:
+    	\begin{itemize}
+    		\item În \texttt{Board.cpp}, \texttt{const\_cast} este utilizat în cadrul operatorului de indexare non-const pentru a refolosi implementarea versiunii \texttt{const}, evitând astfel duplicarea logicii de acces la date.
+    	\end{itemize}
+    	
+    	\item \textbf{Gestiunea memoriei și a datelor}:
+    	\begin{itemize}
+    		\item \textbf{\texttt{std::optional}}: Reprezintă celulele tablei, unde absența valorii (X sau O) indică o celulă liberă, eliminând utilizarea valorilor magice.
+    		\item \textbf{\texttt{std::unique\_ptr} \& \texttt{std::make\_unique}}: Gestionează ciclul de viață al obiectului \texttt{Board}, asigurând eliberarea memoriei fără intervenție manuală.
+    		\item \textbf{\texttt{std::reference\_wrapper}}: Folosit pentru \texttt{GameDataConstRef}, permițând UI-ului să vizualizeze datele jocului prin referință, având avantajul de a fi nulabil (folositor când aveți nevoie de containere de referințe).
+    	\end{itemize}
+    	
+    	\item \textbf{Afișare de text în consolă (C++23)}:
+    	\begin{itemize}
+    		\item Se utilizează \texttt{std::println} pentru afișarea stării jocului în consolă, oferind o alternativă mai sigură și mai rapidă la \texttt{std::cout}.
+    	\end{itemize}
+    \end{itemize}
+    
+    \section{Implementarea Interfeței Grafice (Frontend)}
+    
+    Interfața grafică a aplicației a fost dezvoltată utilizând framework-ul \textbf{Qt 6}, adoptând un design reactiv bazat pe arhitectura \textbf{MVVM (Model-View-ViewModel)}.
+    
+    \subsection{Gestiunea Resurselor}
+    
+    \begin{itemize}
+    	\item \textbf{Smart Pointers (\texttt{std::shared\_ptr})}: \texttt{MainWindow} și \texttt{BoardWidget} partajează posesia obiectului \texttt{GameViewModel}. Aceasta asigură că logica de business rămâne validă pe tot parcursul ciclului de viață al componentelor vizuale, prevenind accesările de memorie nevalidă.
+    \end{itemize}
+    
+    \subsection{Componentele Vizuale și Modern C++}
+    
+    
+    
+    \begin{itemize}
+    	\item \textbf{MainWindow}: Configurează layout-ul principal și elementele de stare. Un aspect important este utilizarea \texttt{m\_viewModel.get()} în cadrul funcțiilor \texttt{connect}, separând clar posesia resursei de utilizarea ei în sistemul de semnale și sloturi Qt.
+    	\item \textbf{BoardWidget și C++20 Ranges}: În loc de bucle \texttt{for} imbricate, se utilizează biblioteca \texttt{<ranges>}:
+    	\begin{itemize}
+    		\item \texttt{std::views::join}: Permite tratarea matricei bidimensionale de celule ca pe o listă liniară (platirea structurii).
+    		\item \texttt{std::ranges::for\_each}: Aplică funcția \texttt{Reset} pe fiecare \texttt{CellWidget} într-o singură instrucțiune declarativă, eliminând erorile de indexare.
+    	\end{itemize}
+    	\item \textbf{CellWidget}: Extinde \texttt{QPushButton} și încapsulează logica de afișare a simbolurilor. Starea internă este gestionată prin \texttt{std::optional<Symbol>}, iar dezactivarea butonului după marcare este automată, asigurând integritatea regulilor de joc.
+    \end{itemize}
+    
+    \subsection{Integrarea și Comunicarea (Signals \& Slots)}
+    
+    
+    
+    Sistemul de comunicare este declanșat de interfața \texttt{IListener} din backend, care este implementată de \texttt{GameViewModel}:
+    \begin{enumerate}
+    	\item \textbf{Input}: Clicul pe un \texttt{CellWidget} emite un semnal captat de \texttt{BoardWidget}, care apelează \texttt{m\_viewModel->PlayMove}.
+    	\item \textbf{Sincronizare}: ViewModel-ul primește notificarea de la motorul de joc și emite semnalul \texttt{CellChanged}.
+    \end{enumerate}
+
     
     % =============================================================================
     % PARTEA IV - AVANSAT (Opțional/Tu)

@@ -11,7 +11,7 @@ class BoardWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit BoardWidget(GameViewModel* viewModel, QWidget* parent = nullptr);
+	explicit BoardWidget(std::shared_ptr<GameViewModel> viewModel, QWidget* parent = nullptr);
 	~BoardWidget() = default;
 
 	void ResetBoard();
@@ -23,7 +23,7 @@ private slots:
 	void OnGameReset();
 
 private:
-	GameViewModel* m_viewModel;
+	std::shared_ptr<GameViewModel> m_viewModel;
 	QGridLayout* m_layout;
 	std::array<std::array<CellWidget*, 3>, 3> m_cells;
 
